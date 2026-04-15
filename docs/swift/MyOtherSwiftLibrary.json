@@ -1,0 +1,126 @@
+[{
+  "\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyHiddenSymbols.swift" : {
+    "key.diagnostic_stage" : "source.diagnostic.stage.swift.parse",
+    "key.length" : 185,
+    "key.offset" : 0,
+    "key.substructure" : [
+      {
+        "key.accessibility" : "source.lang.swift.accessibility.public",
+        "key.annotated_decl" : "<Declaration>public func hiddenSymbol() -&gt; <Type usr=\"s:SS\">String<\/Type><\/Declaration>",
+        "key.attributes" : [
+          {
+            "key.attribute" : "source.decl.attribute.public",
+            "key.length" : 6,
+            "key.offset" : 126
+          }
+        ],
+        "key.bodylength" : 20,
+        "key.bodyoffset" : 164,
+        "key.column" : 13,
+        "key.decl_lang" : "source.lang.swift",
+        "key.doc_comment" : "This function is hidden because it is not included in ``GenerationContext,documented_objects``.\n\n- Returns: Hello",
+        "key.doc.column" : 13,
+        "key.doc.comment" : "This function is hidden because it is not included in ``GenerationContext,documented_objects``.\n\n- Returns: Hello",
+        "key.doc.declaration" : "public func hiddenSymbol() -> String",
+        "key.doc.file" : "\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyHiddenSymbols.swift",
+        "key.doc.full_as_xml" : "<Function file=\"\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyHiddenSymbols.swift\" line=\"5\" column=\"13\"><Name>hiddenSymbol()<\/Name><USR>s:19MyOtherSwiftLibrary12hiddenSymbolSSyF<\/USR><Declaration>public func hiddenSymbol() -&gt; String<\/Declaration><CommentParts><Abstract><Para>This function is hidden because it is not included in <codeVoice>GenerationContext,documented_objects<\/codeVoice>.<\/Para><\/Abstract><ResultDiscussion><Para>Hello<\/Para><\/ResultDiscussion><\/CommentParts><\/Function>",
+        "key.doc.line" : 5,
+        "key.doc.name" : "hiddenSymbol()",
+        "key.doc.result_discussion" : [
+          {
+            "Para" : "Hello"
+          }
+        ],
+        "key.doc.type" : "Function",
+        "key.doclength" : 125,
+        "key.docoffset" : 1,
+        "key.filepath" : "\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyHiddenSymbols.swift",
+        "key.fully_annotated_decl" : "<decl.function.free><syntaxtype.keyword>public<\/syntaxtype.keyword> <syntaxtype.keyword>func<\/syntaxtype.keyword> <decl.name>hiddenSymbol<\/decl.name>() -&gt; <decl.function.returntype><ref.struct usr=\"s:SS\">String<\/ref.struct><\/decl.function.returntype><\/decl.function.free>",
+        "key.kind" : "source.lang.swift.decl.function.free",
+        "key.length" : 52,
+        "key.line" : 5,
+        "key.modulename" : "MyOtherSwiftLibrary",
+        "key.name" : "hiddenSymbol()",
+        "key.namelength" : 14,
+        "key.nameoffset" : 138,
+        "key.offset" : 133,
+        "key.parsed_declaration" : "public func hiddenSymbol() -> String",
+        "key.parsed_scope.end" : 7,
+        "key.parsed_scope.start" : 5,
+        "key.reusingastcontext" : false,
+        "key.typename" : "() -> String",
+        "key.typeusr" : "$sSSycD",
+        "key.usr" : "s:19MyOtherSwiftLibrary12hiddenSymbolSSyF"
+      }
+    ]
+  }
+}, {
+  "\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyOtherSwiftLibrary.swift" : {
+    "key.diagnostic_stage" : "source.diagnostic.stage.swift.parse",
+    "key.length" : 250,
+    "key.offset" : 0,
+    "key.substructure" : [
+      {
+        "key.accessibility" : "source.lang.swift.accessibility.public",
+        "key.annotated_decl" : "<Declaration>public func Hello(animal: <Type usr=\"s:14MySwiftLibrary6AnimalO\">Animal<\/Type>) -&gt; <Type usr=\"s:SS\">String<\/Type><\/Declaration>",
+        "key.attributes" : [
+          {
+            "key.attribute" : "source.decl.attribute.public",
+            "key.length" : 6,
+            "key.offset" : 169
+          }
+        ],
+        "key.bodylength" : 35,
+        "key.bodyoffset" : 214,
+        "key.column" : 13,
+        "key.decl_lang" : "source.lang.swift",
+        "key.doc_comment" : "Says hello to a ``MySwiftLibrary.Animal``.\n\n- Parameters:\n    - animal: An animal to say hello to.\n\n- Returns A hello text.",
+        "key.doc.column" : 13,
+        "key.doc.comment" : "Says hello to a ``MySwiftLibrary.Animal``.\n\n- Parameters:\n    - animal: An animal to say hello to.\n\n- Returns A hello text.",
+        "key.doc.declaration" : "public func Hello(animal: Animal) -> String",
+        "key.doc.discussion" : [
+          {
+            "List-Bullet" : ""
+          }
+        ],
+        "key.doc.file" : "\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyOtherSwiftLibrary.swift",
+        "key.doc.full_as_xml" : "<Function file=\"\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyOtherSwiftLibrary.swift\" line=\"9\" column=\"13\"><Name>Hello(animal:)<\/Name><USR>s:19MyOtherSwiftLibrary5Hello6animalSS0acD06AnimalO_tF<\/USR><Declaration>public func Hello(animal: Animal) -&gt; String<\/Declaration><CommentParts><Abstract><Para>Says hello to a <codeVoice>MySwiftLibrary.Animal<\/codeVoice>.<\/Para><\/Abstract><Parameters><Parameter><Name>animal<\/Name><Direction isExplicit=\"0\">in<\/Direction><Discussion><Para>An animal to say hello to.<\/Para><\/Discussion><\/Parameter><\/Parameters><Discussion><List-Bullet><Item><Para>Returns A hello text.<\/Para><\/Item><\/List-Bullet><\/Discussion><\/CommentParts><\/Function>",
+        "key.doc.line" : 9,
+        "key.doc.name" : "Hello(animal:)",
+        "key.doc.parameters" : [
+          {
+            "discussion" : [
+              {
+                "Para" : "An animal to say hello to."
+              }
+            ],
+            "name" : "animal"
+          }
+        ],
+        "key.doc.type" : "Function",
+        "key.doclength" : 146,
+        "key.docoffset" : 23,
+        "key.filepath" : "\/Users\/emma\/Developer\/swift-rst-docs\/tests\/MySwiftPackage\/Sources\/MyOtherSwiftLibrary\/MyOtherSwiftLibrary.swift",
+        "key.fully_annotated_decl" : "<decl.function.free><syntaxtype.keyword>public<\/syntaxtype.keyword> <syntaxtype.keyword>func<\/syntaxtype.keyword> <decl.name>Hello<\/decl.name>(<decl.var.parameter><decl.var.parameter.argument_label>animal<\/decl.var.parameter.argument_label>: <decl.var.parameter.type><ref.enum usr=\"s:14MySwiftLibrary6AnimalO\">Animal<\/ref.enum><\/decl.var.parameter.type><\/decl.var.parameter>) -&gt; <decl.function.returntype><ref.struct usr=\"s:SS\">String<\/ref.struct><\/decl.function.returntype><\/decl.function.free>",
+        "key.kind" : "source.lang.swift.decl.function.free",
+        "key.length" : 74,
+        "key.line" : 9,
+        "key.modulename" : "MyOtherSwiftLibrary",
+        "key.name" : "Hello(animal:)",
+        "key.namelength" : 21,
+        "key.nameoffset" : 181,
+        "key.offset" : 176,
+        "key.parsed_declaration" : "public func Hello(animal: Animal) -> String",
+        "key.parsed_scope.end" : 11,
+        "key.parsed_scope.start" : 9,
+        "key.reusingastcontext" : false,
+        "key.substructure" : [
+
+        ],
+        "key.typename" : "(Animal) -> String",
+        "key.typeusr" : "$s6animalSS14MySwiftLibrary6AnimalO_tcD",
+        "key.usr" : "s:19MyOtherSwiftLibrary5Hello6animalSS0acD06AnimalO_tF"
+      }
+    ]
+  }
+}]

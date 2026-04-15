@@ -1,0 +1,34 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "swift-rst-docs"
+version = "1.0"
+dependencies = [
+  "beautifulsoup4",
+  "pygments",
+  "types-Pygments"
+]
+requires-python = ">=3.8"
+authors = [
+  {name = "Emma Labbé", email = "emma@labbe.me"}
+]
+maintainers = [
+  {name = "Emma Labbé", email = "emma@labbe.me"}
+]
+description = "Generate RST Swift documentation for Sphinx."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+keywords = ["swift", "rst", "sphinx", "documentation"]
+classifiers = [
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Homepage = "https://git.gatit.es/emma/swift-rst-docs"
+Repository = "https://git.gatit.es/emma/swift-rst-docs.git"
+
+[project.scripts]
+swift-rst-docs = "swift_rst_docs:main"
