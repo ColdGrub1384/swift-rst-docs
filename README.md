@@ -16,7 +16,7 @@ $ brew install sourcekitten
 ## Usage
 
 You need to generate a JSON file with SourceKitten first.
-To reference symbols in your documentation, place their full name between 4 backticks. For example: `\`\`MyStructure.hello(world:)\`\`` or `\`\`MySwiftLibrary.MyStructure.hello(world:)\`\`` when referencing from another module or the documentation's overview text. This will create a link to the symbol's page.
+To reference symbols in your documentation, place their full name between 4 backticks. For example: ``` ``MyStructure.hello(world:)`` ``` or ``` ``MySwiftLibrary.MyStructure.hello(world:)`` ``` when referencing from another module or the documentation's overview text. This will create a link to the symbol's page.
 
 ```bash
 $ sourcekitten doc [--spm] [-- <swift / xcodebuild arguments>] > documentation.json
