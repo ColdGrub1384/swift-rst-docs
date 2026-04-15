@@ -9,7 +9,7 @@
 project = 'swift-rst-docs'
 copyright = '2026, Emma Labbé'
 author = 'Emma Labbé'
-release = '1.0'
+release = '1.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
