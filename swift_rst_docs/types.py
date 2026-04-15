@@ -11,23 +11,69 @@ class DeclarationKind(Enum):
     """
 
     CLASS = "source.lang.swift.decl.class"
+    """
+    A class.
+    """
+
     PROTOCOL = "source.lang.swift.decl.protocol"
+    """
+    A protocol.
+    """
+
     STRUCT = "source.lang.swift.decl.struct"
+    """
+    A structure.
+    """
+
     ENUM = "source.lang.swift.decl.enum"
+    """
+    An enumeration.
+    """
+
     FUNCTION = "source.lang.swift.decl.function.free"
+    """
+    A global function.
+    """
 
     INSTANCE_VARIABLE = "source.lang.swift.decl.var.instance"
+    """
+    An instance variable.
+    """
+
     INSTANCE_METHOD = "source.lang.swift.decl.function.method.instance"
+    """
+    An instance method.
+    """
+
     STATIC_VARIABLE = "source.lang.swift.decl.var.static"
+    """
+    A static variable.
+    """
+
     STATIC_METHOD = "source.lang.swift.decl.function.method.static"
+    """
+    A static method.
+    """
 
     ENUM_ELEMENT = "source.lang.swift.decl.enumelement"
+    """
+    An enumeration case.
+    """
 
     EXTENSION = "source.lang.swift.decl.extension"
+    """
+    An extension.
+    """
 
     LOCAL_VARIABLE = "source.lang.swift.decl.var.local"
+    """
+    A local variable.
+    """
 
     UNKNOWN = "unknown"
+    """
+    An unknown declaration.
+    """
 
     @classmethod
     def _missing_(cls, value):
@@ -40,12 +86,34 @@ class Accessibility(Enum):
     """
 
     OPEN = "source.lang.swift.accessibility.open"
+    """
+    Open for inheritance.
+    """
+
     PUBLIC = "source.lang.swift.accessibility.public"
+    """
+    Accessible from another module.
+    """
+
     INTERNAL = "source.lang.swift.accessibility.internal"
+    """
+    Restricted to the module.
+    """
+
     FILEPRIVATE = "source.lang.swift.accessibility.fileprivate"
+    """
+    Restricted to the source file.
+    """
+
     PRIVATE = "source.lang.swift.accessibility.private"
+    """
+    Restricted to the containing declaration.
+    """
 
     UNKNOWN = "unknown"
+    """
+    Unknown accessibility.
+    """
 
     @property
     def order(self) -> int:
