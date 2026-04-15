@@ -55,6 +55,16 @@ class DeclarationKind(Enum):
     A static method.
     """
 
+    CLASS_VARIABLE = "source.lang.swift.decl.var.class"
+    """
+    A class variable.
+    """
+
+    CLASS_METHOD = "source.lang.swift.decl.function.method.class"
+    """
+    A class method.
+    """
+
     ENUM_ELEMENT = "source.lang.swift.decl.enumelement"
     """
     An enumeration case.

@@ -131,6 +131,10 @@ class Page:
                             friendly_kind = "Functions"
                     case DeclarationKind.STATIC_METHOD:
                         friendly_kind = "Static Functions"
+                    case DeclarationKind.CLASS_VARIABLE:
+                        friendly_kind = "Class Properties"
+                    case DeclarationKind.CLASS_METHOD:
+                        friendly_kind = "Class Functions"
                     case DeclarationKind.INSTANCE_VARIABLE:
                         friendly_kind = "Properties"
                     case DeclarationKind.STATIC_VARIABLE:
