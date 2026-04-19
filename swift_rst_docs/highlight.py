@@ -165,7 +165,7 @@ def highlight_statement(statement: AnnotatedDeclaration, prettify: bool, remove_
                     new_link.string = child.string
                     child.string = ""
                     new_link["class"] = child["class"]
-                    new_link["style"] = "text-decoration: underline"
+                    new_link["style"] = "text-decoration: underline !important"
                     child.append(new_link)
         except KeyError:
             continue
