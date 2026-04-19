@@ -89,16 +89,16 @@ class Page:
         if item.documentation and item.documentation.parameters:
             self.contents += "Parameters\n----------\n\n"
             for param in item.documentation.parameters:
-                self.contents += f"- **{param['name']}**: {param['description']}\n"
+                self.contents += f"- **{param['name']}**: {replace_links(param['description'], item.module_name, context)}\n"
             self.contents += "\n"
         
         if item.documentation and item.documentation.result:
             self.contents += "Returns\n-------\n\n"
-            self.contents += f"{item.documentation.result}\n\n"
+            self.contents += f"{replace_links(item.documentation.result, item.module_name, context)}\n\n"
                 
         if item.documentation and item.documentation.discussion:
             self.contents += "Discussion\n----------\n\n"
-            self.contents += f"{item.documentation.discussion}\n\n"
+            self.contents += f"{replace_links(item.documentation.discussion, item.module_name, context)}\n\n"
 
         subitems: list[Symbol] = []
         is_mark = any(isinstance(x, MARK) for x in item.substructure)
