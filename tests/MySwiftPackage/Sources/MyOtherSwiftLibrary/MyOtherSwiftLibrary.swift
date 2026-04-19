@@ -5,7 +5,7 @@ import MySwiftLibrary
 /// - Parameters:
 ///     - animal: An animal to say hello to.
 ///
-/// - Returns A hello text.
+/// - Returns: A hello text.
 public func Hello(animal: Animal) -> String {
     return "Hello \(animal.name)"
 }
