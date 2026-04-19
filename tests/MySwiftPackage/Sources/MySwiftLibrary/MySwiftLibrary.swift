@@ -42,7 +42,7 @@ public protocol MyProtocol {
     /// - Parameters:
     ///     - bar: A string to process.
     ///
-    /// - Returns: Processed ```bar``.
+    /// - Returns: Processed ``bar``.
     func foo(bar: String) -> String
 
 }
