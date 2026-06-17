@@ -1,4 +1,4 @@
-from .types import Symbol, MARK, parse, fetch_fullnames, GenerationContext, DeclarationKind
+from .types import Symbol, Structure, MARK, parse, fetch_fullnames, GenerationContext, DeclarationKind
 from .highlight import highlight_statement
 from dataclasses import dataclass
 from typing import Optional
@@ -9,25 +9,48 @@ import re
 
 
 _DOCUMENTATION_LINK_STYLE = """
-
 .. raw:: html
 
    <style>
-   .doc-link {
-       font-family: var(--font-stack--monospace);
-   }
+       .doc-link {
+           font-family: var(--font-stack--monospace);
+       }
    </style>
 
    <script type="text/javascript">
-   window.onload = function() {
-       document.querySelectorAll("a[href*='#doclink']").forEach(function(link) {
-           link.classList.add("doc-link");
-           link.href = link.href.replace("#doclink", "");
-       });
-   }
+       window.onload = function() {
+           document.querySelectorAll("a[href^='s_']").forEach(function(link) {
+               link.classList.add("doc-link");
+           });
+       }
    </script>
 
+   <style>
+       .symbol-toctree ul {
+           list-style-type: none !important;
+           padding-left: 0 !important;
+           margin-left: 0 !important;
+       }
+
+       .symbol-toctree .toctree-l1 {
+           list-style: none !important;
+       }
+
+       .symbol-toctree .toctree-l1 > a > code > .pre {
+           font-size: 120% !important;
+       }
+   </style>
 """
+
+
+_SECTIONS = [
+    ("Classes", DeclarationKind.CLASS),
+    ("Structures", DeclarationKind.STRUCT),
+    ("Functions", DeclarationKind.FUNCTION),
+    ("Protocols", DeclarationKind.PROTOCOL),
+    ("Enumerations", DeclarationKind.ENUM),
+    ("Extensions", DeclarationKind.EXTENSION)
+]
 
 
 class Page:
@@ -54,50 +77,32 @@ class Page:
         self._subpages = []
 
         self.file_name = (item.usr or item.name).replace(':', '_')+".rst"
-        self.contents = f"``{item.name}``\n{('=' * len(item.name))}====\n\n"
+        self.contents = ":orphan:\n\n"
         if item.usr:
-            self.contents += f".. index:: {item.usr}\n\n"
+            self.contents += f".. _{item.usr.replace(":", "_")}:\n\n"
+        self.contents += f"``{item.name}``\n{('=' * len(item.name))}====\n\n"
+        
         if item.documentation and item.documentation.comment:
             self.contents += f"{item.documentation.comment}\n\n"
 
         self.contents += _DOCUMENTATION_LINK_STYLE
 
-        self.contents += """
-
-.. raw:: html
-
-   <style>
-   .toctree-wrapper ul {
-       list-style-type: none !important;
-       padding-left: 0 !important;
-       margin-left: 0 !important;
-   }
-
-   .toctree-l1 {
-       list-style: none !important;
-   }
-
-   .main .toctree-l1 > a > code > .pre { font-size: 120% !important; }
-   </style>
-
-"""
-
-        self.contents += "Declaration\n-----------\n\n"
+        self.contents += "\n.. rubric:: Declaration\n"
         decl = item.declaration
         self.contents += highlight_statement(decl, True, item.inherited_types is not None, context)
                 
         if item.documentation and item.documentation.parameters:
-            self.contents += "Parameters\n----------\n\n"
+            self.contents += ".. rubric:: Parameters\n\n"
             for param in item.documentation.parameters:
                 self.contents += f"- **{param['name']}**: {replace_links(param['description'], item.module_name, context)}\n"
             self.contents += "\n"
         
         if item.documentation and item.documentation.result:
-            self.contents += "Returns\n-------\n\n"
+            self.contents += ".. rubric:: Returns\n\n"
             self.contents += f"{replace_links(item.documentation.result, item.module_name, context)}\n\n"
                 
         if item.documentation and item.documentation.discussion:
-            self.contents += "Discussion\n----------\n\n"
+            self.contents += ".. rubric:: Discussion\n\n"
             self.contents += f"{replace_links(item.documentation.discussion, item.module_name, context)}\n\n"
 
         subitems: list[Symbol] = []
@@ -118,7 +123,9 @@ class Page:
         if not is_mark:
             categorized_subitems: dict[str, list[Symbol]] = {}
             for subitem in item.substructure:
-                if isinstance(subitem, MARK) or subitem.accessibility.order < context.min_accessibility.order:
+                if not isinstance(subitem, Symbol):
+                    continue
+                if subitem.accessibility.order < context.min_accessibility.order:
                     continue
             
                 match subitem.kind:
@@ -153,12 +160,14 @@ class Page:
                 categorized_subitems[friendly_kind].append(subitem)
 
         for subitem in item.substructure:
-            if isinstance(subitem, MARK) or subitem.accessibility.order < context.min_accessibility.order:
+            if not isinstance(subitem, Symbol): 
+                continue
+            if subitem.accessibility.order < context.min_accessibility.order:
                 continue
             self._subpages.append(Page(subitem, context))
 
         if is_mark:
-            marks_and_items = list(filter(lambda x: isinstance(x, MARK) or x.accessibility.order >= context.min_accessibility.order, item.substructure[:]))
+            marks_and_items = list(filter(lambda x: isinstance(x, MARK) or (isinstance(x, Symbol) and x.accessibility.order >= context.min_accessibility.order), item.substructure[:]))
             if len(marks_and_items) > 0 and not isinstance(marks_and_items[0], MARK):
                 has_mark_before_inits = False
                 has_init_items = False
@@ -184,7 +193,7 @@ class Page:
             for subitem in marks_and_items:
                 if isinstance(subitem, MARK):
                     sections.append((subitem.name, []))
-                else:
+                elif isinstance(subitem, Symbol):
                     sections[-1][1].append(subitem)
 
             for section in sections:
@@ -196,12 +205,19 @@ class Page:
                     else:
                         continue
 
+                    if "key.overrides" in _item._body:
+                        continue
+
                     if i == 0:
-                        self.contents += f"\n{section[0]}\n{'-' * len(section[0])}\n"
+                        self.contents += f"\n.. rubric:: {section[0]}\n\n"
                     i += 1
 
+                    self.contents += "\n.. raw:: html\n\n"
+                    self.contents += "   <div class='symbol-toctree'>\n\n"
                     self.contents += f"\n.. toctree::\n   :maxdepth: 1\n\n"
-                    self.contents += f"   {usr_name}\n"
+                    self.contents += f"   {usr_name}\n\n"
+                    self.contents += ".. raw:: html\n\n"
+                    self.contents += "   </div>\n"
                     if _item.documentation and _item.documentation.comment:
                         self.contents += f"\n{_item.documentation.comment}\n\n"
 
@@ -215,22 +231,29 @@ class Page:
                         else:
                             continue
 
+                        if "key.overrides" in _item._body:
+                            continue
+
                         if i == 0:
-                            self.contents += f"\n{decl_type}\n{'-' * len(decl_type)}\n"
+                            self.contents += f"\n.. rubric:: {decl_type}\n"
                         i += 1
 
+                        self.contents += "\n.. raw:: html\n\n"
+                        self.contents += "   <div class='symbol-toctree'>\n\n"
                         self.contents += f".. toctree::\n   :maxdepth: 1\n\n"
-                        self.contents += f"   {usr_name}\n"
+                        self.contents += f"   {usr_name}\n\n"
+                        self.contents += ".. raw:: html\n\n"
+                        self.contents += "   </div>\n"
                         if _item.documentation and _item.documentation.comment:
                             self.contents += f"\n{_item.documentation.comment}\n\n"
                         self.contents += "\n"
 
         if item.inherited_types:
-            self.contents += "\nConforms to\n-----------\n\n"
+            self.contents += ".. rubric:: Conforms to\n\n"
             for inherited in item.inherited_types:
                 usr = context.find(inherited, item.module_name)
                 if usr:
-                    self.contents += f"- `{inherited} <{usr.replace(':', '_')}.html#doclink>`_\n"
+                    self.contents += f"- :ref:`{usr.replace(':', '_')}`\n"
                 else:
                     self.contents += f"- ``{inherited}``\n"
             self.contents += "\n"
@@ -242,10 +265,61 @@ class MainPage(Page):
     This is the same as the module index page when there is only one module.
     """
 
-    def __init__(self, contents: str, context: GenerationContext):
+    def __init__(self, context: GenerationContext):
         self.file_name = "index.rst"
-        self.contents = contents
         self.context = context
+        self.contents = f"{context.index_title}\n{('=' * len(context.index_title))}\n\n"
+
+        modules: dict[str, list[Symbol]] = {}
+        for item in context.body:
+            if item.module_name not in modules:
+                modules[item.module_name] = []
+            modules[item.module_name].append(item)
+
+        if context.overview:
+            if len(modules) == 1:
+                only_module_name = list(modules.keys())[0]
+            else:
+                only_module_name = None
+            overview_text = replace_links(context.overview, only_module_name, context)
+            self.contents += f"{overview_text}\n"
+
+        self.contents += _DOCUMENTATION_LINK_STYLE
+
+        if len(modules) == 1:
+            module_name, module_items = list(modules.items())[0]
+
+            self.contents += f""".. code-block:: swift
+
+    import {module_name}
+
+"""
+
+            for title, key in _SECTIONS:
+                items = list(filter(lambda x: x.kind == key, module_items))
+                valid_items = []
+                for item in items:
+                    if item.usr:
+                        valid_items.append(item.usr.replace(":", "_"))
+                
+                if valid_items:
+                    self.contents += "\n.. raw:: html\n\n"
+                    self.contents += "   <div class='symbol-toctree'>\n\n"
+                    self.contents += f".. toctree::\n   :maxdepth: 1\n   :caption: {title}\n\n"
+                    for item_usr in valid_items:
+                        self.contents += f"   {item_usr}\n"
+                    self.contents += "\n"
+                    self.contents += "\n.. raw:: html\n\n"
+                    self.contents += "\n\n   </div>\n\n"
+        else:
+            self.contents += "\n.. raw:: html\n\n"
+            self.contents += "   <div class='symbol-toctree'>\n\n"
+            self.contents += f".. toctree::\n   :maxdepth: 2\n   :caption: Modules\n\n"
+            for module_name in modules.keys():
+                self.contents += f"   {module_name}\n"
+            self.contents += "\n"
+            self.contents += "\n.. raw:: html\n\n"
+            self.contents += "\n\n   </div>\n\n"
 
 
 class ModulePage(Page):
@@ -253,10 +327,70 @@ class ModulePage(Page):
     The index page for a module.
     """
 
-    def __init__(self, module_name: str, contents: str, context: GenerationContext):
-        self.file_name = f"{module_name}.rst"
-        self.contents = contents
+    name: str
+    """
+    The module name.
+    """
+
+    title: bool
+    """
+    Whether to include the document's title.
+    """
+
+    declaration: bool
+    """
+    Whether to include the module's declaration.
+    """
+
+    members: list[str] | None
+    """
+    Member names (without the module) to include in the module page.
+    If ``None``, all members will be included.
+    """
+
+    def __init__(self, name: str, context: GenerationContext, title: bool = True, declaration: bool = True, members: list[str] | None = None):
+        self.file_name = f"{name}.rst"
         self.context = context
+        self.name = name
+        self.declaration = declaration
+        self.members = members
+
+        self.contents = ""
+        if title:
+            self.contents += f"{name}\n{('=' * len(name))}\n"
+        self.contents += _DOCUMENTATION_LINK_STYLE
+
+        module_items = list(filter(lambda x: x.module_name == name, context.body))
+
+        if declaration:
+            self.contents += f""".. code-block:: swift
+
+    import {name}
+
+"""
+
+        for _title, key in _SECTIONS:
+            items = list(filter(lambda x: x.kind == key, module_items))
+            valid_items = []
+            for item in items:
+                if item.usr:
+                    valid_items.append(item)
+            if not valid_items:
+                continue
+            self.contents += f"\n.. rubric:: {_title}\n"
+            for item in valid_items:
+                if members is not None and item.name not in members:
+                    continue
+                if not item.usr:
+                    continue
+                self.contents += "\n.. raw:: html\n\n"
+                self.contents += "   <div class='symbol-toctree'>\n\n"
+                self.contents += f".. toctree::\n   :maxdepth: 1\n\n"
+                self.contents += f"   {item.usr.replace(':', '_')}\n"
+                self.contents += "\n.. raw:: html\n\n"
+                self.contents += "   </div>\n"
+                if item.documentation and item.documentation.comment:
+                    self.contents += f"\n\n{item.documentation.comment}\n\n"
 
 
 def replace_links(text: str, module_name: Optional[str], context: GenerationContext) -> str:
@@ -270,112 +404,45 @@ def replace_links(text: str, module_name: Optional[str], context: GenerationCont
     :rtype: str
     """
 
+    def doc_name(match):
+        return (context.find(match.group(1), module_name) or "").replace(':', '_')
+
     new_text = re.sub(
         r"``(.*?)``",
-        lambda match: f"`{match.group(1)} <{(context.find(match.group(1), module_name) or "").replace(':', '_')}.html#doclink>`_" if context.find(match.group(1), module_name) else match.group(0),
+        lambda match: f":ref:`{doc_name(match)}`" if context.find(match.group(1), module_name) else match.group(0),
         text
     )
+
     return new_text
 
 
-def generate_documentation(context: GenerationContext) -> list[Page]:
+def generate_documentation(context: GenerationContext, index: bool = True) -> list[Page]:
     """
     Generates and returns all the documentation pages for the passed generation context.
     :py:func:`swift_rst_docs.fetch_documents` should have been called first.
     If multiple modules were fetched, will generate an index page for each module.
 
+    The ``ìndex`` argument controls whether an index page should be generated.
+    If it's ``True`` and only one module is documented, the index page will correspond to that module.
+    If it's ``False``, the module page will be generated in its own file as it happens with multiple modules but no 'index.rst' page will be generated. 
+
     :param context: The generation context.
+    :param index: Whether to generate an index page.
     :rtype: list[Page]
     """
 
-    sections = [
-        ("Classes", DeclarationKind.CLASS),
-        ("Structures", DeclarationKind.STRUCT),
-        ("Functions", DeclarationKind.FUNCTION),
-        ("Protocols", DeclarationKind.PROTOCOL),
-        ("Enumerations", DeclarationKind.ENUM),
-        ("Extensions", DeclarationKind.EXTENSION)
-    ]
-
     pages: list[Page] = []
-    document: dict[DeclarationKind, list[Symbol]] = {}
-    modules: dict[str, list[Symbol]] = {}
+    module_names: set[str] = set()
     for item in context.body:
         if not item.usr:
             continue
-        if item.module_name not in modules:
-            modules[item.module_name] = []
+        module_names.add(item.module_name)
         page = Page(item, context)
         pages.append(page)
-        modules[item.module_name].append(item)
 
-    main_document = f"{context.index_title}\n{"=" * len(context.index_title)}"
-    main_document += "\n\n"
-
-    if context.overview:
-        if len(modules) == 1:
-            only_module_name = list(modules.keys())[0]
-        else:
-            only_module_name = None
-        overview_text = replace_links(context.overview, only_module_name, context)
-        main_document += f"{overview_text}\n"
-
-    main_document += _DOCUMENTATION_LINK_STYLE
-
-    if len(modules) == 1:
-        module_name, module_items = list(modules.items())[0]
-
-        main_document += f""".. code-block:: swift
-
-    import {module_name}
-
-
-"""
-
-        for title, key in sections:
-            items = list(filter(lambda x: x.kind == key, module_items))
-            valid_items = []
-            for item in items:
-                if item.usr:
-                    valid_items.append(item.usr.replace(":", "_"))
-            
-            if valid_items:
-                main_document += f".. toctree::\n   :maxdepth: 1\n   :caption: {title}\n\n"
-                for item_usr in valid_items:
-                    main_document += f"   {item_usr}\n"
-                main_document += "\n"
-    else:
-        for module_name, module_items in modules.items():
-            module_document = f"{module_name}\n{"=" * len(module_name)}"
-            module_document += "\n\n"
-            module_document += _DOCUMENTATION_LINK_STYLE
-
-            module_document += f""".. code-block:: swift
-
-    import {module_name}
-
-
-"""
-
-            for title, key in sections:
-                items = list(filter(lambda x: x.kind == key, module_items))
-                valid_items = []
-                for item in items:
-                    if item.usr:
-                        valid_items.append(item.usr.replace(":", "_"))
-                
-                if valid_items:
-                    module_document += f".. toctree::\n   :maxdepth: 1\n   :caption: {title}\n\n"
-                    for item_usr in valid_items:
-                        module_document += f"   {item_usr}\n"
-                    module_document += "\n"
-
-            pages.append(ModulePage(module_name, module_document, context))
-
-        main_document += f".. toctree::\n   :maxdepth: 2\n   :caption: Modules\n\n"
-        for module_name in modules.keys():
-            main_document += f"   {module_name}\n"
-        main_document += "\n"
+    if not (len(module_names) == 1 and index):
+        for module_name in module_names:
+            pages.append(ModulePage(module_name, context))
 
     all_pages: list[Page] = []
     
@@ -390,7 +457,8 @@ def generate_documentation(context: GenerationContext) -> list[Page]:
     for page in pages:
         flatten(page)
 
-    all_pages.append(MainPage(main_document, context))
+    if index:
+        all_pages.append(MainPage(context))
     return all_pages
 
 
@@ -405,7 +473,7 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
     with open(api_file_path, "r") as f:
         structure = json.load(f)
 
-    body: list[Symbol] = []
+    body: list[Structure] = []
 
     for objects in structure:
         object_path = list(objects.keys())[0]
@@ -427,7 +495,11 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
         for item in items:
             parsed = parse(item, context)
             if parsed.name in list(map(lambda x: x.name, body)):
-                existing_statement = list(filter(lambda x: x.name == parsed.name and x.module_name == parsed.module_name, body))[0]
+                def filter_statements(x: Structure) -> bool:
+                    if not isinstance(parsed, Symbol) or not isinstance(x, Symbol):
+                        return False
+                    return x.name == parsed.name and x.module_name == parsed.module_name
+                existing_statement = list(filter(filter_statements, body))[0]
                 if isinstance(parsed, Symbol) and isinstance(existing_statement, Symbol):
                     if parsed.kind == DeclarationKind.EXTENSION:
                         existing_statement.substructure += parsed.substructure
@@ -458,4 +530,5 @@ __all__ = [
     "Page",
     "MainPage",
     "ModulePage",
-]    
+]
+

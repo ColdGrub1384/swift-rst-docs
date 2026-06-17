@@ -7,7 +7,7 @@ import os
 
 
 DIR_NAME = os.path.dirname(__file__)
-OUTPUT_PATH = os.path.join(DIR_NAME, "..", "docs", "swift")
+OUTPUT_PATH = os.path.join(DIR_NAME, "..", "docs", "swift", "_api")
 
 
 os.makedirs(OUTPUT_PATH, exist_ok=True)
@@ -86,7 +86,7 @@ Link to ``MyStructure.hello(world:)``.
 """
         text = replace_links(text, "MySwiftLibrary", self.context)
         self.assertEqual(text, """
-Link to `MyStructure.hello(world:) <s_14MySwiftLibrary0A9StructureV5hello5worldS2S_tF.html#doclink>`_.
+Link to :ref:`s_14MySwiftLibrary0A9StructureV5hello5worldS2S_tF`.
 """)
 
         text = """
@@ -94,7 +94,7 @@ Link to ``MySwiftLibrary.MyStructure.hello(world:)``.
 """
         text = replace_links(text, None, self.context)
         self.assertEqual(text, """
-Link to `MySwiftLibrary.MyStructure.hello(world:) <s_14MySwiftLibrary0A9StructureV5hello5worldS2S_tF.html#doclink>`_.
+Link to :ref:`s_14MySwiftLibrary0A9StructureV5hello5worldS2S_tF`.
 """)
 
     def test_fullnames(self):

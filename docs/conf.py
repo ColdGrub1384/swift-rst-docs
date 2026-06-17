@@ -9,12 +9,12 @@
 project = 'swift-rst-docs'
 copyright = '2026, Emma Labbé'
 author = 'Emma Labbé'
-release = '1.1'
+release = '2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = ["sphinx.ext.autodoc", "swift_rst_docs"]
 
 templates_path = ['_templates']
 exclude_patterns = []

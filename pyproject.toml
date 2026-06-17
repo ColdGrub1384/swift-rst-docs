@@ -4,11 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "swift-rst-docs"
-version = "1.2"
+version = "2.0"
 dependencies = [
   "beautifulsoup4",
   "pygments",
-  "types-Pygments"
+  "types-Pygments",
+  "sphinx",
+  "furo"
 ]
 requires-python = ">=3.8"
 authors = [

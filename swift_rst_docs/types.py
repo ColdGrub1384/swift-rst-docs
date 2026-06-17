@@ -276,6 +276,8 @@ class AnnotatedDeclaration:
             parsed += root.text
 
         for item in root:
+            if not item.text:
+                continue
             if item.tag == "Type":
                 chunks.append(Annotation(item.text, item.attrib.get("usr")))
             else:
@@ -352,7 +354,7 @@ class Documentation:
                 param_name = param.find("Name")
                 param_discussion = param.find(".//Discussion")
                 self.parameters.append({
-                    "name": param_name.text if param_name is not None else "",
+                    "name": param_name.text if param_name and param_name.text else "",
                     "description": self._extract_comment(param_discussion, context) if param_discussion is not None else ""
                 })
         
@@ -377,7 +379,7 @@ class Documentation:
             if child.tag == "codeVoice":
                 name = child.text
                 if name in context.fullnames:
-                    result += f"`{name} <{context.fullnames[name].replace(':', '_')}.html#doclink>`_"
+                    result += f":ref:`{context.fullnames[name].replace(':', '_')}`"
                 else:
                     result += f"``{child.text}``"
             elif child.tag == "Para":
@@ -541,7 +543,7 @@ def fetch_fullnames(body: dict, context: GenerationContext, parent_names: list[s
         fetch_fullnames(sub, context, parent_names + ([name] if name else []))
 
 
-def parse(body: dict, context: GenerationContext) -> Symbol:
+def parse(body: dict, context: GenerationContext) -> Structure:
     """
     Parses a symbol from the documentation JSON file and returns it.
 
