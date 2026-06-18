@@ -353,8 +353,10 @@ class Documentation:
             for param in parameters_elem.findall("Parameter"):
                 param_name = param.find("Name")
                 param_discussion = param.find(".//Discussion")
+                if param_name is None or param_name.text is None or param_name.text == "":
+                    continue
                 self.parameters.append({
-                    "name": param_name.text if param_name and param_name.text else "",
+                    "name": param_name.text,
                     "description": self._extract_comment(param_discussion, context) if param_discussion is not None else ""
                 })
         
