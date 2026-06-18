@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List, Dict
 from enum import Enum
 import sys
 
@@ -168,14 +168,14 @@ class GenerationContext:
     A text written into the main page.
     """
 
-    documented_objects: Optional[list[str]]
+    documented_objects: Optional[List[str]]
     """
     An optional list of documented files (with .swift extension).
     If `None`, all files in the module will be documented.
     :py:func:`swift_rst_docs.fetch_documents` checks if the fetched file paths end with any of the values of this list, so you can write just the file names, or the paths relative to any directory in the source code to disambiguate between modules.
     """
 
-    documented_symbols: Optional[list[str]]
+    documented_symbols: Optional[List[str]]
     """
     An optional list of top level documented symbol names.
     If `None`, all symbols will be documented.
@@ -186,7 +186,7 @@ class GenerationContext:
     Minimum accessibility for symbols to be documented. 
     """
 
-    fullnames: dict[str, str]
+    fullnames: Dict[str, str]
     """
     A dictionary mapping full symbols names to their documentation's USR.
     A USR is an unique identifier of a symbol in the documentation, which corresponds to the file name (without the extension) in the documentation's root directory by replacing `":"` with `"_"`.
@@ -194,7 +194,7 @@ class GenerationContext:
     This value is written by :py:func:`swift_rst_docs.fetch_fullnames`.
     """
 
-    body: list[Symbol]
+    body: List[Symbol]
     """
     Top level symbols fetched by :py:func:`swift_rst_docs.fetch_documents`.
     """
@@ -204,8 +204,8 @@ class GenerationContext:
         index_title: str,
         overview: Optional[str] = None,
         min_accessibility: Accessibility = Accessibility.PUBLIC,
-        documented_objects: Optional[list[str]] = None,
-        documented_symbols: Optional[list[str]] = None
+        documented_objects: Optional[List[str]] = None,
+        documented_symbols: Optional[List[str]] = None
     ):
         self.index_title = index_title
         self.overview = overview or ""
@@ -260,7 +260,7 @@ class AnnotatedDeclaration:
     The full parsed declaration as plain text.
     """
 
-    chunks: list[Annotation]
+    chunks: List[Annotation]
     """
     The typed chunks of the declaration.
     """
@@ -319,7 +319,7 @@ class Documentation:
     The rest of the comment string.
     """
 
-    parameters: list[dict[str, str]]
+    parameters: List[Dict[str, str]]
     """
     A list of parameters witht their documentation.
     Each value has `name` and a `description` key.
@@ -469,12 +469,12 @@ class Symbol(Structure):
     An optional documentation attached to the symbol.
     """
 
-    inherited_types: Optional[list[str]]
+    inherited_types: Optional[List[str]]
     """
     Types the symbol inherits from.
     """
 
-    substructure: list[Structure]
+    substructure: List[Structure]
     """
     Sub-declarations of the symbol.
     """
@@ -484,9 +484,9 @@ class Symbol(Structure):
     The generation context fetching this symbol.
     """
 
-    _body: dict
+    _body: Dict
 
-    def __init__(self, body: dict, context: GenerationContext):
+    def __init__(self, body: Dict, context: GenerationContext):
         self._body = body
         self.context = context
         self.name = body["key.name"]
@@ -513,7 +513,7 @@ class Symbol(Structure):
             self.substructure = []
 
 
-def fetch_fullnames(body: dict, context: GenerationContext, parent_names: list[str] = []):
+def fetch_fullnames(body: Dict, context: GenerationContext, parent_names: List[str] = []):
     """
     Fetches a symbol's full name (including their module) and all their sub declarations recursively, mapped to their USR value and writes them to :py:attr:`GenerationContext.fullnames`.
 
@@ -545,7 +545,7 @@ def fetch_fullnames(body: dict, context: GenerationContext, parent_names: list[s
         fetch_fullnames(sub, context, parent_names + ([name] if name else []))
 
 
-def parse(body: dict, context: GenerationContext) -> Structure:
+def parse(body: Dict, context: GenerationContext) -> Structure:
     """
     Parses a symbol from the documentation JSON file and returns it.
 

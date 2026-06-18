@@ -1,7 +1,7 @@
 from .types import Symbol, Structure, MARK, parse, fetch_fullnames, GenerationContext, DeclarationKind
 from .highlight import highlight_statement
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List, Dict, Tuple
 import warnings
 import json
 import os
@@ -70,7 +70,7 @@ class Page:
     The contents of the generated page.
     """
 
-    _subpages: list["Page"]
+    _subpages: List["Page"]
 
     def __init__(self, item: Symbol, context: GenerationContext):
 
@@ -105,7 +105,7 @@ class Page:
             self.contents += ".. rubric:: Discussion\n\n"
             self.contents += f"{replace_links(item.documentation.discussion, item.module_name, context)}\n\n"
 
-        subitems: list[Symbol] = []
+        subitems: List[Symbol] = []
         is_mark = any(isinstance(x, MARK) for x in item.substructure)
 
         order = [
@@ -121,7 +121,7 @@ class Page:
         ]
 
         if not is_mark:
-            categorized_subitems: dict[str, list[Symbol]] = {}
+            categorized_subitems: Dict[str, List[Symbol]] = {}
             for subitem in item.substructure:
                 if not isinstance(subitem, Symbol):
                     continue
@@ -189,7 +189,7 @@ class Page:
                 else:
                     marks_and_items.insert(0, MARK({"key.name": f"MARK: - Members"}))
 
-            sections: list[tuple[str, list[Symbol]]] = []
+            sections: List[Tuple[str, List[Symbol]]] = []
             for subitem in marks_and_items:
                 if isinstance(subitem, MARK):
                     sections.append((subitem.name, []))
@@ -270,7 +270,7 @@ class MainPage(Page):
         self.context = context
         self.contents = f"{context.index_title}\n{('=' * len(context.index_title))}\n\n"
 
-        modules: dict[str, list[Symbol]] = {}
+        modules: Dict[str, List[Symbol]] = {}
         for item in context.body:
             if item.module_name not in modules:
                 modules[item.module_name] = []
@@ -342,13 +342,13 @@ class ModulePage(Page):
     Whether to include the module's declaration.
     """
 
-    members: list[str] | None
+    members: Optional[List[str]]
     """
     Member names (without the module) to include in the module page.
     If ``None``, all members will be included.
     """
 
-    def __init__(self, name: str, context: GenerationContext, title: bool = True, declaration: bool = True, members: list[str] | None = None):
+    def __init__(self, name: str, context: GenerationContext, title: bool = True, declaration: bool = True, members: Optional[List[str]] = None):
         self.file_name = f"{name}.rst"
         self.context = context
         self.name = name
@@ -416,7 +416,7 @@ def replace_links(text: str, module_name: Optional[str], context: GenerationCont
     return new_text
 
 
-def generate_documentation(context: GenerationContext, index: bool = True) -> list[Page]:
+def generate_documentation(context: GenerationContext, index: bool = True) -> List[Page]:
     """
     Generates and returns all the documentation pages for the passed generation context.
     :py:func:`swift_rst_docs.fetch_documents` should have been called first.
@@ -428,10 +428,10 @@ def generate_documentation(context: GenerationContext, index: bool = True) -> li
 
     :param context: The generation context.
     :param index: Whether to generate an index page.
-    :rtype: list[Page]
+    :rtype: List[Page]
     """
 
-    pages: list[Page] = []
+    pages: List[Page] = []
     module_names: set[str] = set()
     for item in context.body:
         if not item.usr:
@@ -444,7 +444,7 @@ def generate_documentation(context: GenerationContext, index: bool = True) -> li
         for module_name in module_names:
             pages.append(ModulePage(module_name, context))
 
-    all_pages: list[Page] = []
+    all_pages: List[Page] = []
     
     def flatten(p: Page):
         all_pages.append(p)
@@ -473,7 +473,7 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
     with open(api_file_path, "r") as f:
         structure = json.load(f)
 
-    body: list[Structure] = []
+    body: List[Structure] = []
 
     for objects in structure:
         object_path = list(objects.keys())[0]

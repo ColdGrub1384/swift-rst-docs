@@ -9,7 +9,7 @@ from sphinx.util.nodes import make_refnode
 from sphinx.util.osutil import relative_uri
 from sphinx.util.docutils import SphinxDirective
 
-from importlib.metadata import version
+from typing import List, Dict
 
 from docutils import nodes
 from docutils.utils import new_document
@@ -42,7 +42,7 @@ class SphinxContext:
         self.generated_files = []
 
 
-_sphinx_contexts: dict[Sphinx, SphinxContext] = {}
+_sphinx_contexts: Dict[Sphinx, SphinxContext] = {}
 
 
 class ModuleDirective(SphinxDirective):
@@ -56,7 +56,7 @@ class ModuleDirective(SphinxDirective):
         "declaration": directives.flag
     }
 
-    def parse(self, rst: str) -> list[nodes.Node]:
+    def parse(self, rst: str) -> List[nodes.Node]:
         std = self.env.get_domain("std")
         # Resolve toctree document names and remove title
         lines = []
