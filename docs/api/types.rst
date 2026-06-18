@@ -3,8 +3,6 @@ Types
 
 Types representing the documents structure.
 
-.. automodule:: swift_rst_docs
-
 .. autoclass:: swift_rst_docs.Accessibility
    :members:
 

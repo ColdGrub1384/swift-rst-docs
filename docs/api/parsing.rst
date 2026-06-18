@@ -4,8 +4,6 @@ Parsing
 Functions related to SourceKitten file parsing.
 This is used internally for document generation.
 
-.. automodule:: swift_rst_docs
-
 .. autofunction:: swift_rst_docs.parse
 .. autofunction:: swift_rst_docs.fetch_fullnames
 .. autofunction:: swift_rst_docs.replace_links
