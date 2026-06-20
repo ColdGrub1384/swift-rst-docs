@@ -346,7 +346,7 @@ class Documentation:
         
         discussion_elem = comment_parts.find("Discussion") if comment_parts is not None else None
         self.discussion = self._extract_comment(discussion_elem, context) if discussion_elem is not None else None
-        
+ 
         self.parameters = []
         parameters_elem = root.find(".//Parameters")
         if parameters_elem is not None:
@@ -385,6 +385,8 @@ class Documentation:
                 else:
                     result += f"``{child.text}``"
             elif child.tag == "Para":
+                if result:
+                    result += "\n\n"
                 result += self._extract_comment(child, context)
             else:
                 result += self._extract_comment(child, context)
