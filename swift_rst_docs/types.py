@@ -360,9 +360,9 @@ class Documentation:
                     "description": self._extract_comment(param_discussion, context) if param_discussion is not None else ""
                 })
         
-        if comment_parts:
+        if comment_parts is not None:
             result_elem = comment_parts.find("ResultDiscussion")
-            if result_elem:
+            if result_elem is not None:
                 self.result = self._extract_comment(result_elem, context) if result_elem is not None else ""
             else:
                 self.result = None
