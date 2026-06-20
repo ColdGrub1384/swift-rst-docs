@@ -27,6 +27,8 @@ from .doc import (
         _DOCUMENTATION_LINK_STYLE
 )
 
+from importlib.metadata import version
+
 
 logger = logging.getLogger(__name__)
 
