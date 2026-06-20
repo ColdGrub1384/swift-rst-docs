@@ -373,14 +373,14 @@ class ModulePage(Page):
             items = list(filter(lambda x: x.kind == key, module_items))
             valid_items = []
             for item in items:
+                if members is not None and item.name not in members:
+                    continue
                 if item.usr:
                     valid_items.append(item)
             if not valid_items:
                 continue
             self.contents += f"\n.. rubric:: {_title}\n"
             for item in valid_items:
-                if members is not None and item.name not in members:
-                    continue
                 if not item.usr:
                     continue
                 self.contents += "\n.. raw:: html\n\n"
