@@ -330,6 +330,11 @@ class Documentation:
     The description of the return value.
     """
 
+    throws: Optional[str]
+    """
+    The description of the errors that can be thrown.
+    """
+
     def __init__(self, body: str, context: GenerationContext):
         root = ET.fromstring(body)
         
@@ -363,11 +368,17 @@ class Documentation:
         if comment_parts is not None:
             result_elem = comment_parts.find("ResultDiscussion")
             if result_elem is not None:
-                self.result = self._extract_comment(result_elem, context) if result_elem is not None else ""
+                self.result = self._extract_comment(result_elem, context)
             else:
                 self.result = None
+            throws_elem = comment_parts.find("ThrowsDiscussion")
+            if throws_elem is not None:
+                self.throws = self._extract_comment(throws_elem, context)
+            else:
+                self.throws = None
         else:
             self.result = None
+            self.throws = None
     
     def _extract_comment(self, elem, context):
         if elem is None:

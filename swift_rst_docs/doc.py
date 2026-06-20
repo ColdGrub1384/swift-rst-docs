@@ -100,7 +100,11 @@ class Page:
         if item.documentation and item.documentation.result:
             self.contents += ".. rubric:: Returns\n\n"
             self.contents += f"{replace_links(item.documentation.result, item.module_name, context)}\n\n"
-                
+
+        if item.documentation and item.documentation.throws:
+            self.contents += ".. rubric:: Throws\n\n"
+            self.contents += f"{replace_links(item.documentation.throws, item.module_name, context)}\n\n"
+
         if item.documentation and item.documentation.discussion:
             self.contents += ".. rubric:: Discussion\n\n"
             self.contents += f"{replace_links(item.documentation.discussion, item.module_name, context)}\n\n"
