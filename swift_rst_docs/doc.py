@@ -499,7 +499,11 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
                     if not isinstance(parsed, Symbol) or not isinstance(x, Symbol):
                         return False
                     return x.name == parsed.name and x.module_name == parsed.module_name
-                existing_statement = list(filter(filter_statements, body))[0]
+                existing_statements = list(filter(filter_statements, body))
+                if len(existing_statements) > 0:
+                    existing_statement = existing_statements[0]
+                else:
+                    existing_statement = None
                 if isinstance(parsed, Symbol) and isinstance(existing_statement, Symbol):
                     if parsed.kind == DeclarationKind.EXTENSION:
                         existing_statement.substructure += parsed.substructure
@@ -512,7 +516,6 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
                     body.append(parsed)
             else:
                 body.append(parsed)
-
     for item in body:
         if not isinstance(item, Symbol):
             continue
