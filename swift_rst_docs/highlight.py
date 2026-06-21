@@ -93,7 +93,7 @@ def prettify_swift_declaration(decl: str, indent: str = "    ") -> str:
             result.append(tok)
 
         else:
-            if result and not result[-1].endswith(("\n", "(", "[", " ", ".", "@")) and tok not in ("]", ")", ":", "?", "!"):
+            if result and not result[-1].endswith(("\n", "(", "[", "<", " ", ".", "@")) and tok not in ("]", ")", ">", ":", "?", "!"):
                 result.append(" ")
             result.append(tok)
             if tok.startswith("@"):
