@@ -514,7 +514,10 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
                     existing_statement = None
                 if isinstance(parsed, Symbol) and isinstance(existing_statement, Symbol):
                     if parsed.kind == DeclarationKind.EXTENSION:
-                        existing_statement.substructure += parsed.substructure
+                        for sub in parsed.substructure:
+                            same = list(filter(lambda s: s.name == sub.name, existing_statement.substructure))
+                            if not same:
+                                existing_statement.substructure.append(sub)
                     else:
                         i = body.index(existing_statement)
                         body.remove(existing_statement)
