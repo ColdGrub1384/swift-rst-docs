@@ -9,7 +9,7 @@ from sphinx.util.nodes import make_refnode
 from sphinx.util.osutil import relative_uri
 from sphinx.util.docutils import SphinxDirective
 
-from typing import List, Dict
+from typing import List
 
 from docutils import nodes
 from docutils.utils import new_document
@@ -44,7 +44,7 @@ class SphinxContext:
         self.generated_files = []
 
 
-_sphinx_contexts: Dict[Sphinx, SphinxContext] = {}
+
 
 
 class ModuleDirective(SphinxDirective):
@@ -62,7 +62,7 @@ class ModuleDirective(SphinxDirective):
         std = self.env.get_domain("std")
         # Resolve toctree document names and remove title
         lines = []
-        context = _sphinx_contexts[self.env.app]
+        context = getattr(self.env, "_swift_rst_context")
         for line in rst.splitlines():
             unspaced = line.replace(" ", "")
             try:
@@ -83,7 +83,7 @@ class ModuleDirective(SphinxDirective):
 
     def run(self):
         module_name = self.arguments[0]
-        context = _sphinx_contexts[self.env.app]
+        context = getattr(self.env, "_swift_rst_context")
         if module_name not in context.module_contexts:
             self.error(f"No Swift module named '{module_name}' was found.")
         gen_context = context.module_contexts[module_name]
@@ -125,7 +125,7 @@ class SwiftDomain(Domain):
         docname = None
         fullnames = {}
 
-        context = _sphinx_contexts[env.app]
+        context = getattr(env, "_swift_rst_context")
         for doc in context.gencontexts:
             fullnames.update(doc.fullnames)
         if target in fullnames:
@@ -164,7 +164,7 @@ class SwiftDomain(Domain):
 def generate_symbol_pages(app: Sphinx):
     src_dir = app.srcdir
     context_obj = SphinxContext()
-    _sphinx_contexts[app] = context_obj
+    setattr(app.env, "_swift_rst_context", context_obj)
 
     # Find all _api directories recursively
     for root, dirs, files in os.walk(src_dir):
@@ -214,12 +214,11 @@ def generate_symbol_pages(app: Sphinx):
 
 
 def cleanup_source(app, exc):
-    if app in _sphinx_contexts:
-        context = _sphinx_contexts[app]
+    context = getattr(app.env, "_swift_rst_context", None)
+    if context is not None:
         for doc in context.generated_files:
             if os.path.exists(doc):
                 os.remove(doc)
-        del _sphinx_contexts[app]
 
 
 def setup(app: Sphinx):
