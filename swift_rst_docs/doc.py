@@ -12,20 +12,6 @@ _DOCUMENTATION_LINK_STYLE = """
 .. raw:: html
 
    <style>
-       .doc-link {
-           font-family: var(--font-stack--monospace);
-       }
-   </style>
-
-   <script type="text/javascript">
-       window.onload = function() {
-           document.querySelectorAll("a[href^='s_']").forEach(function(link) {
-               link.classList.add("doc-link");
-           });
-       }
-   </script>
-
-   <style>
        .symbol-toctree ul {
            list-style-type: none !important;
            padding-left: 0 !important;
@@ -415,9 +401,19 @@ def replace_links(text: str, module_name: Optional[str], context: GenerationCont
     def doc_name(match):
         return (context.find(match.group(1), module_name) or "").replace(':', '_')
 
+    def link(match):
+        ref = match.group(1)
+        if context.sphinx:
+            if ref in context.fullnames:
+                return f":swift:symbol:`{ref}`"
+            else:
+                return f":swift:symbol:`{module_name}.{ref}`"
+        else:
+            return f":ref:`{doc_name(match)}`"
+
     new_text = re.sub(
         r"``(.*?)``",
-        lambda match: f":ref:`{doc_name(match)}`" if context.find(match.group(1), module_name) else match.group(0),
+        lambda match: link(match) if context.find(match.group(1), module_name) else match.group(0),
         text
     )
 

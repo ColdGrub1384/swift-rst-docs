@@ -199,6 +199,13 @@ class GenerationContext:
     Top level symbols fetched by :py:func:`swift_rst_docs.fetch_documents`.
     """
 
+    sphinx: bool
+    """
+    Whether the documentation is being built witht the Sphinx extension.
+
+    If ``True``, symbol references will use the ``:swift:symbol:`` role instead of ``:ref:`` to make the name monospaced.
+    """
+
     def __init__(
         self,
         index_title: str,

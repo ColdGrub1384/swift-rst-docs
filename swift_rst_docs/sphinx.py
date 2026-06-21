@@ -130,12 +130,10 @@ class SwiftDomain(Domain):
             fullnames.update(doc.fullnames)
         if target in fullnames:
             docname = fullnames[target].replace(":", "_")
-            has_module_name = True
         else:
             matching = list(filter(lambda n: ".".join(n.split(".")[1:]) == target, fullnames.keys()))
             if len(matching) > 0:
                 docname = fullnames[matching[0]].replace(":", "_")
-                has_module_name = False
             if len(matching) > 1:
                 formatted_matches = list(map(lambda m: f"'{m}'", ", ".join(matching)))
                 msg = f"{len(matching)} matches found from different modules for '{target}' (using the first one): {formatted_matches}. Disambiguate by specifying the module name."
@@ -178,6 +176,7 @@ def generate_symbol_pages(app: Sphinx):
                 index_title=index_title,
                 min_accessibility=Accessibility.PUBLIC
             )
+            context.sphinx = True
             context_obj.gencontexts.append(context)
 
             # Find all json files in .sourcekitten
@@ -230,3 +229,4 @@ def setup(app: Sphinx):
         "parallel_read_safe": True,
         "parallel_write_safe": True,
     }
+
