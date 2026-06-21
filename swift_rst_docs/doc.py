@@ -398,7 +398,7 @@ class ModulePage(Page):
                 self.contents += "\n.. raw:: html\n\n"
                 self.contents += "   </div>\n"
                 if item.documentation and item.documentation.comment:
-                    self.contents += f"\n\n{item.documentation.comment}\n\n"
+                    self.contents += f"\n\n{replace_links(item.documentation.comment, name, context)}\n\n"
 
 
 def replace_links(text: str, module_name: Optional[str], context: GenerationContext) -> str:
