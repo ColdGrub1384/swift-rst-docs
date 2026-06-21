@@ -1,7 +1,7 @@
 from .types import Symbol, Structure, MARK, parse, fetch_fullnames, GenerationContext, DeclarationKind
 from .highlight import highlight_statement
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Tuple
+from typing import Optional, List, Dict, Tuple, Sequence
 import warnings
 import json
 import os
@@ -373,17 +373,21 @@ class ModulePage(Page):
 
 """
 
+        sections: Sequence[Tuple[Optional[str], Optional[DeclarationKind]]]
+        if members is not None:
+            sections = [(None, None)]
+        else:
+            sections = _SECTIONS
         for _title, key in _SECTIONS:
-            items = list(filter(lambda x: x.kind == key, module_items))
+            items = list(filter(lambda x: (members is not None and x.name in members) or x.kind == key, module_items))
             valid_items = []
             for item in items:
-                if members is not None and item.name not in members:
-                    continue
                 if item.usr:
                     valid_items.append(item)
             if not valid_items:
                 continue
-            self.contents += f"\n.. rubric:: {_title}\n"
+            if _title:
+                self.contents += f"\n.. rubric:: {_title}\n"
             for item in valid_items:
                 if not item.usr:
                     continue
