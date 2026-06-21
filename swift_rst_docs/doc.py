@@ -364,17 +364,15 @@ class ModulePage(Page):
             sections = [(None, None)]
         else:
             sections = _SECTIONS
-        for _title, key in _SECTIONS:
+        for _title, key in sections:
             items = list(filter(lambda x: (members is not None and x.name in members) or x.kind == key, module_items))
-            valid_items = []
-            for item in items:
-                if item.usr:
-                    valid_items.append(item)
-            if not valid_items:
-                continue
+            if members is not None:
+                order = {name: i for i, name in enumerate(members)}
+                items.sort(key=lambda item: order.get(item.name, len(order)))
+
             if _title:
                 self.contents += f"\n.. rubric:: {_title}\n"
-            for item in valid_items:
+            for item in items:
                 if not item.usr:
                     continue
                 self.contents += "\n.. raw:: html\n\n"
