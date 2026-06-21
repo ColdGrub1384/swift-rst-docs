@@ -83,7 +83,7 @@ class Page:
         self.contents += f"``{item.name}``\n{('=' * len(item.name))}====\n\n"
         
         if item.documentation and item.documentation.comment:
-            self.contents += f"{item.documentation.comment}\n\n"
+            self.contents += f"{replace_links(item.documentation.comment, item.module_name, context)}\n\n"
 
         self.contents += _DOCUMENTATION_LINK_STYLE
 
