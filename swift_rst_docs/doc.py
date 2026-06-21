@@ -209,7 +209,7 @@ class Page:
                     self.contents += ".. raw:: html\n\n"
                     self.contents += "   </div>\n"
                     if _item.documentation and _item.documentation.comment:
-                        self.contents += f"\n{_item.documentation.comment}\n\n"
+                        self.contents += f"\n{replace_links(_item.documentation.comment, item.module_name, context)}\n\n"
 
         else:
             for decl_type in order:
@@ -235,7 +235,7 @@ class Page:
                         self.contents += ".. raw:: html\n\n"
                         self.contents += "   </div>\n"
                         if _item.documentation and _item.documentation.comment:
-                            self.contents += f"\n{_item.documentation.comment}\n\n"
+                            self.contents += f"\n{replace_links(_item.documentation.comment, _item.module_name, context)}\n\n"
                         self.contents += "\n"
 
         if item.inherited_types:
