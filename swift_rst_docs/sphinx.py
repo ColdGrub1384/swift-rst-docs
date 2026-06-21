@@ -143,8 +143,11 @@ class SwiftDomain(Domain):
             return None
 
         std = env.get_domain("std")
-        docname, labelid, sectname = std.data["labels"][docname.lower()]
-        shortened_target = target if not has_module_name else ".".join(target.split(".")[1:])
+        try:
+            docname, labelid, sectname = std.data["labels"][docname.lower()]
+        except KeyError:
+            return None
+        shortened_target = target.split(".")[-1]
 
         contnode = nodes.literal()
         contnode += nodes.Text(shortened_target)
