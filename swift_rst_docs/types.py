@@ -380,32 +380,161 @@ class Documentation:
             self.result = None
             self.throws = None
     
+    # Callout tags that map to RST directives (tag -> directive name)
+    _CALLOUT_TAGS = {
+        "Note": "note",
+        "Warning": "warning",
+        "Important": "important",
+        "Attention": "attention",
+        "Tip": "tip",
+        "Hint": "hint",
+        "Danger": "danger",
+        "Caution": "caution",
+        "Bug": "admonition",
+        "Requires": "admonition",
+        "Precondition": "admonition",
+        "Postcondition": "admonition",
+        "Invariant": "admonition",
+        "Complexity": "admonition",
+        "Author": "admonition",
+        "Authors": "admonition",
+        "Copyright": "admonition",
+        "Date": "admonition",
+        "SeeAlso": "seealso",
+        "Since": "admonition",
+        "Version": "admonition",
+        "Experiment": "admonition",
+        "TODO": "admonition",
+    }
+
     def _extract_comment(self, elem, context):
         if elem is None:
             return ""
-        
-        result = ""
+
+        parts = []
+
+        # Leading text directly inside the element
         if elem.text:
-            result += elem.text
-        
+            parts.append(elem.text)
+
         for child in elem:
-            if child.tag == "codeVoice":
-                name = child.text
-                if name in context.fullnames:
-                    result += f":ref:`{context.fullnames[name].replace(':', '_')}`"
+            tag = child.tag
+
+            if tag == "codeVoice":
+                # Inline code – optionally cross-reference known symbols
+                text = child.text or ""
+                if text in context.fullnames:
+                    parts.append(f":ref:`{context.fullnames[text].replace(':', '_')}`")
                 else:
-                    result += f"``{child.text}``"
-            elif child.tag == "Para":
-                if result:
-                    result += "\n\n"
-                result += self._extract_comment(child, context)
+                    parts.append(f"``{text}``")
+
+            elif tag == "Para":
+                # Flush any accumulated inline text, then render the paragraph
+                inline = "".join(parts).strip()
+                parts = []
+                para_text = self._extract_comment(child, context)
+                if inline:
+                    parts.append(inline + "\n\n" + para_text)
+                else:
+                    parts.append(para_text)
+
+            elif tag == "CodeListing":
+                # Fenced code block; optional language via 'language' attribute
+                lang = child.attrib.get("language", "")
+                # Code lines are usually in <zCodeLineNumbered> or bare text
+                code_lines = []
+                raw = child.text or ""
+                for line_elem in child:
+                    if line_elem.text:
+                        code_lines.append(line_elem.text)
+                    if line_elem.tail:
+                        raw += line_elem.tail
+                if code_lines:
+                    code_text = "\n".join(code_lines)
+                else:
+                    code_text = raw
+                directive = f"code-block:: {lang}" if lang else "code-block::"
+                indented = "\n".join("   " + l for l in code_text.splitlines())
+                parts.append(f"\n\n.. {directive}\n\n{indented}\n\n")
+
+            elif tag in ("List-Bullet", "List-Number"):
+                # Render a bullet or numbered list
+                numbered = (tag == "List-Number")
+                items = []
+                for item in child.findall("Item"):
+                    item_text = self._extract_comment(item, context).strip()
+                    # Indent continuation lines
+                    item_lines = item_text.splitlines()
+                    if item_lines:
+                        prefix = "#. " if numbered else "- "
+                        first = prefix + item_lines[0]
+                        rest = ["  " + l for l in item_lines[1:]]
+                        items.append("\n".join([first] + rest))
+                parts.append("\n\n" + "\n".join(items) + "\n\n")
+
+            elif tag == "Item":
+                # Bare <Item> outside a list container – treat as a bullet
+                item_text = self._extract_comment(child, context).strip()
+                parts.append(f"- {item_text}")
+
+            elif tag == "Name":
+                # Field / parameter name – render as bold
+                parts.append(f"**{child.text or ''}**")
+
+            elif tag == "emphasis":
+                parts.append(f"*{child.text or ''}*")
+
+            elif tag == "bold":
+                parts.append(f"**{child.text or ''}**")
+
+            elif tag == "Link":
+                url = child.attrib.get("href", child.text or "")
+                label = child.text or url
+                parts.append(f"`{label} <{url}>`_")
+
+            elif tag == "Parameter":
+                # A single parameter block when encountered inline
+                param_name_elem = child.find("Name")
+                param_disc_elem = child.find(".//Discussion")
+                param_name = param_name_elem.text if param_name_elem is not None else ""
+                param_desc = self._extract_comment(param_disc_elem, context) if param_disc_elem is not None else ""
+                parts.append(f"\n\n:param {param_name}: {param_desc}")
+
+            elif tag == "Parameters":
+                # A whole parameters section encountered inline
+                for param in child.findall("Parameter"):
+                    param_name_elem = param.find("Name")
+                    param_disc_elem = param.find(".//Discussion")
+                    param_name = param_name_elem.text if param_name_elem is not None else ""
+                    param_desc = self._extract_comment(param_disc_elem, context) if param_disc_elem is not None else ""
+                    parts.append(f"\n\n:param {param_name}: {param_desc}")
+
+            elif tag == "ResultDiscussion":
+                result_text = self._extract_comment(child, context)
+                parts.append(f"\n\n:returns: {result_text}")
+
+            elif tag == "ThrowsDiscussion":
+                throws_text = self._extract_comment(child, context)
+                parts.append(f"\n\n:raises: {throws_text}")
+
+            elif tag in self._CALLOUT_TAGS:
+                directive = self._CALLOUT_TAGS[tag]
+                body_text = self._extract_comment(child, context).strip()
+                indented = "\n".join("   " + l for l in body_text.splitlines())
+                if directive == "admonition":
+                    # Generic admonition uses the tag name as its title
+                    parts.append(f"\n\n.. {directive}:: {tag}\n\n{indented}\n\n")
+                else:
+                    parts.append(f"\n\n.. {directive}::\n\n{indented}\n\n")
+
             else:
-                result += self._extract_comment(child, context)
-            
+                # Unknown tag – recurse and preserve text
+                parts.append(self._extract_comment(child, context))
+
             if child.tail:
-                result += child.tail
-        
-        return result.strip()
+                parts.append(child.tail)
+
+        return "".join(parts).strip()
 
 
 @dataclass
