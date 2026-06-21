@@ -221,6 +221,7 @@ class GenerationContext:
         self.documented_symbols = documented_symbols
         self.fullnames = {}
         self.body = []
+        self.sphinx = False
 
     def find(self, symbol_name: str, module_name: Optional[str]) -> Optional[str]:
         """
