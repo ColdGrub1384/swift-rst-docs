@@ -493,6 +493,8 @@ def fetch_documents(api_file_path: str, context: GenerationContext):
         doc_object = objects[object_path]
         items = doc_object["key.substructure"]
         for item in items:
+            if "key.modulename" not in item:
+                continue
             parsed = parse(item, context)
             if parsed.name in list(map(lambda x: x.name, body)):
                 def filter_statements(x: Structure) -> bool:
