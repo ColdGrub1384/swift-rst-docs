@@ -9,7 +9,7 @@ exclude = [
 
 [project]
 name = "swift-rst-docs"
-version = "2.2"
+version = "2.3"
 dependencies = [
   "beautifulsoup4",
   "pygments",
