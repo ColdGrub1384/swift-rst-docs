@@ -193,7 +193,7 @@ class Page:
                     else:
                         continue
 
-                    if "key.overrides" in _item._body:
+                    if "key.overrides" in _item._body or "key.receivers" in _item._body:
                         continue
 
                     if i == 0:
@@ -219,7 +219,7 @@ class Page:
                         else:
                             continue
 
-                        if "key.overrides" in _item._body:
+                        if "key.overrides" in _item._body or "key.receivers" in _item._body:
                             continue
 
                         if i == 0:
